@@ -8,12 +8,9 @@ T Abs(const T &x) {
   return (x < 0) ? -x : x;
 }
 
-std::vector<std::vector<MatrixType>> DeleteCross(const std::vector<std::vector<
-	MatrixType>> &matrix,
-												 int i, int j) {
+std::vector<std::vector<MatrixType>> DeleteCross(const std::vector<std::vector<MatrixType>> &matrix, int i, int j) {
   int matrix_size = matrix.size();
-  std::vector<std::vector<MatrixType>>
-	  new_matrix(matrix_size - 1, std::vector<MatrixType>(matrix_size - 1));
+  std::vector<std::vector<MatrixType>> new_matrix(matrix_size - 1, std::vector<MatrixType>(matrix_size - 1));
   for (int k = 0; k < matrix_size - 1; ++k) {
 	for (int l = 0; l < matrix_size - 1; ++l) {
 	  new_matrix[k][l] = matrix[k + ((k >= i) ? 1 : 0)][l + ((l >= j) ? 1 : 0)];
@@ -31,8 +28,7 @@ int GetDeterminant(const std::vector<std::vector<MatrixType>> &matrix) {
   }
   int det = 0;
   for (int i = 0; i < matrix.size(); ++i) {
-	det += ((i % 2 == 0) ? 1 : -1) * matrix[0][i]
-		* GetDeterminant(DeleteCross(matrix, 0, i));
+	det += ((i % 2 == 0) ? 1 : -1) * matrix[0][i] * GetDeterminant(DeleteCross(matrix, 0, i));
   }
   return det;
 }
@@ -42,12 +38,9 @@ enum DiagonalType {
   kSideDiagonal
 };
 
-std::vector<std::vector<MatrixType>> TransposeMatrix(
-	const std::vector<std::vector<MatrixType>> &matrix,
-	DiagonalType diagonal_type) {
+std::vector<std::vector<MatrixType>> TransposeMatrix( const std::vector<std::vector<MatrixType>> &matrix, DiagonalType diagonal_type) {
   int matrix_size = matrix.size();
-  std::vector<std::vector<MatrixType>>
-	  new_matrix(matrix_size, std::vector<MatrixType>(matrix_size));
+  std::vector<std::vector<MatrixType>> new_matrix(matrix_size, std::vector<MatrixType>(matrix_size));
   if (diagonal_type == kMainDiagonal) {
 	for (int i = 0; i < matrix_size; ++i) {
 	  for (int j = 0; j < matrix_size; ++j) {
@@ -71,8 +64,7 @@ std::vector<std::vector<MatrixType>> TransposeSubmatrix(
 	int upper_left_y,
 	int submatrix_size) {
 
-  std::vector<std::vector<MatrixType>>
-	  submatrix(submatrix_size, std::vector<MatrixType>(submatrix_size));
+  std::vector<std::vector<MatrixType>> submatrix(submatrix_size, std::vector<MatrixType>(submatrix_size));
 
   int lower_right_x = upper_left_x + submatrix_size;
   int lower_right_y = upper_left_y + submatrix_size;
@@ -82,15 +74,13 @@ std::vector<std::vector<MatrixType>> TransposeSubmatrix(
 	}
   }
 
-  std::vector<std::vector<MatrixType>>
-	  transposed_submatrix = TransposeMatrix(submatrix, diagonal_type);
+  std::vector<std::vector<MatrixType>> transposed_submatrix = TransposeMatrix(submatrix, diagonal_type);
 
   for (int i = upper_left_y; i < lower_right_y; ++i) {
 	for (int j = upper_left_x; j < lower_right_x; ++j) {
 	  matrix[i][j] = transposed_submatrix[i - upper_left_y][j - upper_left_x];
 	}
   }
-
   return matrix;
 }
 
@@ -103,8 +93,7 @@ std::vector<std::vector<MatrixType>> TransposeSubmatrix(
 // были все матрицы с предыдущего уровня, к которым применили всевозможные
 // преобразования подматриц. После этого можно было удалить совпадающие матрицы
 // и сильно уменьшить время работы
-std::vector<std::vector<MatrixType>> GetMatrixWithMaxDeterminant(
-	const std::vector<std::vector<MatrixType>> &matrix, int depth) {
+std::vector<std::vector<MatrixType>> GetMatrixWithMaxDeterminant(const std::vector<std::vector<MatrixType>> &matrix, int depth) {
   if (depth == 0) {
 	return matrix;
   }
@@ -113,30 +102,25 @@ std::vector<std::vector<MatrixType>> GetMatrixWithMaxDeterminant(
   int max_det = Abs(GetDeterminant(matrix));
   std::vector<std::vector<MatrixType>> matrix_with_max_det = matrix;
   for (int submatrix_size = 2; submatrix_size < matrix_size; ++submatrix_size) {
-	for (int submatrix_x_coord = 0;
-		 submatrix_x_coord < matrix_size - submatrix_size + 1;
-		 ++submatrix_x_coord) {
-	  for (int submatrix_y_coord = 0;
-		   submatrix_y_coord < matrix_size - submatrix_size + 1;
-		   ++submatrix_y_coord) {
+	for (int submatrix_x_coord = 0; submatrix_x_coord < matrix_size - submatrix_size + 1; ++submatrix_x_coord) {
+	  for (int submatrix_y_coord = 0; submatrix_y_coord < matrix_size - submatrix_size + 1; ++submatrix_y_coord) {
 
-		std::vector<std::vector<MatrixType>>
-			new_submatrix_main_diag = TransposeSubmatrix(matrix,
-														 kMainDiagonal,
-														 submatrix_x_coord,
-														 submatrix_y_coord,
-														 submatrix_size);
+		std::vector<std::vector<MatrixType>>new_submatrix_main_diag = TransposeSubmatrix(
+			matrix,
+			kMainDiagonal,
+			submatrix_x_coord,
+			submatrix_y_coord,
+			submatrix_size);
 
-		std::vector<std::vector<MatrixType>>
-			new_submatrix_side_diag = TransposeSubmatrix(matrix,
-														 kSideDiagonal,
-														 submatrix_x_coord,
-														 submatrix_y_coord,
-														 submatrix_size);
-		int main_det = Abs(GetDeterminant(GetMatrixWithMaxDeterminant(
-			new_submatrix_main_diag, depth - 1)));
-		int side_det = Abs(GetDeterminant(GetMatrixWithMaxDeterminant(
-			new_submatrix_side_diag, depth - 1)));
+		std::vector<std::vector<MatrixType>> new_submatrix_side_diag = TransposeSubmatrix(
+			matrix,
+			kSideDiagonal,
+			submatrix_x_coord,
+			submatrix_y_coord,
+			submatrix_size);
+		
+		int main_det = Abs(GetDeterminant(GetMatrixWithMaxDeterminant(new_submatrix_main_diag, depth - 1)));
+		int side_det = Abs(GetDeterminant(GetMatrixWithMaxDeterminant(new_submatrix_side_diag, depth - 1)));
 
 		if (main_det > max_det) {
 		  matrix_with_max_det = new_submatrix_main_diag;
@@ -159,8 +143,7 @@ std::vector<std::vector<MatrixType>> GetMatrixWithMaxDeterminant(
 int main() {
   int matrix_size;
   std::cin >> matrix_size;
-  std::vector<std::vector<MatrixType>>
-	  matrix(matrix_size, std::vector<MatrixType>(matrix_size));
+  std::vector<std::vector<MatrixType>> matrix(matrix_size, std::vector<MatrixType>(matrix_size));
 
   for (int i = 0; i < matrix_size; ++i) {
 	for (int j = 0; j < matrix_size; ++j) {
@@ -171,8 +154,7 @@ int main() {
   // можно рассчитать точную формулу глубины рекурсии
   // на которой будут перебраны все возможные комбинации
   int depth = 1;
-  std::vector<std::vector<MatrixType>>
-	  new_matrix = GetMatrixWithMaxDeterminant(matrix, depth);
+  std::vector<std::vector<MatrixType>> new_matrix = GetMatrixWithMaxDeterminant(matrix, depth);
 
 
   std::cout << "Искомая матрица: \n";
